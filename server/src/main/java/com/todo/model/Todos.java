@@ -1,19 +1,37 @@
+// Todos.java
 package com.todo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-
-import java.util.List;
+import jakarta.persistence.*;
 
 @Entity
 public class Todos {
 
     @Id
-    private String todoID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long todoID;
+
     private String todo;
 
     @ManyToOne
-    private List<Users> user;
+    @JoinColumn(name = "userId", nullable = false)
+    private Users user;
+
+    public Todos() {}
+
+    // getters & setters
+    public Long getTodoID() { return todoID; }
+    public void setTodoID(Long todoID) { this.todoID = todoID; }
+
+    public String getTodo() { return todo; }
+    public void setTodo(String todo) { this.todo = todo; }
+
+    public Users getUser() { return user; }
+    public void setUser(Users user) { this.user = user; }
 }
+/**
+ *
+ * One (Users) → Many (Todos)
+ *
+ * Many (Todos) → One (Users)
+ *
+ */
