@@ -2,21 +2,23 @@
 package com.todo.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userID;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String userID;
 
-    private String authID;
+//    private String authID;
     private String name;
     private String email;
 //    private String profileUrl;
 //    private String profileUrlId;
-    private String createdAt;
+    private LocalDateTime createdAt;
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -62,20 +64,20 @@ public class Users {
 //        this.profileUrlId = profileUrlId;
 //    }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
     // getters & setters
-    public Long getUserID() { return userID; }
-    public void setUserID(Long userID) { this.userID = userID; }
+    public String getUserID() { return userID; }
+    public void setUserID(String userID) { this.userID = userID; }
 
-    public String getAuthID() { return authID; }
-    public void setAuthID(String authID) { this.authID = authID; }
+//    public String getAuthID() { return authID; }
+//    public void setAuthID(String authID) { this.authID = authID; }
 
     public List<Todos> getTodos() { return todos; }
     public void setTodos(List<Todos> todos) { this.todos = todos; }

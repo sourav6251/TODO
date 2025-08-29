@@ -1,9 +1,13 @@
 import React from "react";
 import { motion } from "motion/react";
-import { SignedIn, SignedOut, SignInButton, UserButton , useUser,ClerkLoaded, useSignUp} from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton, UserButton,useAuth } from '@clerk/clerk-react';
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
 
+  const { isSignedIn } = useAuth();
+
+  const navigate=useNavigate()
 
   return (
     <div className="bg-gray-50">
@@ -48,23 +52,24 @@ export default function Home() {
             </div>
             <div className="flex items-center">
               {/* Animated Sign In button */}
-              
+              {!isSignedIn&&
               <motion.div
-                whileHover={{ scale: 1.05, boxShadow: "0px 4px 12px rgba(0,0,0,0.2)" }}
-                whileTap={{ scale: 0.95 }}
-                className="cta-btn bg-slate-400 text-white px-4 py-2 rounded-md text-sm font-medium"
-                
-              >
+              whileHover={{ scale: 1.05, boxShadow: "0px 4px 12px rgba(0,0,0,0.2)" }}
+              whileTap={{ scale: 0.95 }}
+              className="cta-btn bg-slate-400 text-white px-4 py-2 rounded-md text-sm font-medium"
+              
+            >
 
-               <SignedOut >
-                <SignInButton oauthFlow="auto"  mode="modal"  />
-              </SignedOut>
-             
+             <SignedOut >
+              <SignInButton oauthFlow="auto"  mode="modal"  />
+            </SignedOut>
+           
+            </motion.div>}
+              
               <SignedIn>
                 <UserButton />
                 {/* Login In */}
               </SignedIn>
-              </motion.div>
               
               
               
@@ -99,14 +104,29 @@ export default function Home() {
                   intuitive CRUD interface.
                 </motion.p>
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <motion.a
-                    href="#"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                  >
-                    Get started
-                  </motion.a>
+                {isSignedIn ? (
+                    <motion.a
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-full cursor-pointer  flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                      onClick={()=>navigate("/todo")}
+                    >
+                      Get started
+                    </motion.a>
+                  ) : (
+                    <SignedOut>
+                      <SignInButton mode="modal" oauthFlow="auto">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="w-full flex cursor-pointer  items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                          
+                        >
+                          Get start
+                        </motion.button>
+                      </SignInButton>
+                    </SignedOut>
+                  )}
                   <motion.a
                     href="#"
                     whileHover={{ scale: 1.05 }}
@@ -345,12 +365,28 @@ export default function Home() {
           </h2>
           <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
             <div className="inline-flex rounded-md shadow">
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"
-              >
-                Get started
-              </a>
+            {isSignedIn ? (
+                    <motion.a
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="cursor-pointer w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white  hover:bg-[#cfcdcd] md:py-4 md:text-lg md:px-10"
+                      onClick={()=>navigate("/todo")}
+                    >
+                      Get started
+                    </motion.a>
+                  ) : (
+                    <SignedOut>
+                      <SignInButton mode="modal" oauthFlow="auto">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="w-full cursor-pointer  flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white  hover:bg-[#cfcdcd] md:py-4 md:text-lg md:px-10"
+                        >
+                          Get start
+                        </motion.button>
+                      </SignInButton>
+                    </SignedOut>
+                  )}
             </div>
             <div className="ml-3 inline-flex rounded-md shadow">
               <a

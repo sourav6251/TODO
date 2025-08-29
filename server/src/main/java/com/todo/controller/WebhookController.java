@@ -1,5 +1,8 @@
 package com.todo.controller;
 
+import com.todo.dto.UserDTO;
+import com.todo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +23,13 @@ import java.util.TimeZone;
 public class WebhookController {
 
     @Value("${clerk.webhook.secret}")
-    private String webhookSecret;// = "whsec_cQ9Pa/WSdkQ0n/z2e7ZZOR1emyV3izbI";
+    private String webhookSecret;
+    @Autowired
+    private UserService userService;
 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Assuming you have a service to handle user operations
-    // @Autowired
-    // private UserService userService;
 
     @PostMapping("/clerk")
     public ResponseEntity<String> handleClerkWebhook(
@@ -162,8 +164,9 @@ public class WebhookController {
         System.out.println("Username: " + userInfo.getUsername());
         System.out.println("Profile Image: " + userInfo.getProfileImageUrl());
 
+
         // Save to database
-        // userService.createUser(userInfo);
+         userService.userCreate(new UserDTO(userInfo.userId, userInfo.name, userInfo.email, userInfo.createdAt));
     }
 
     // Process user update
@@ -177,13 +180,14 @@ public class WebhookController {
         System.out.println("Profile Image: " + userInfo.getProfileImageUrl());
 
         // Update in database
-        // userService.updateUser(userInfo);
+         userService.updateUser(new UserDTO(userInfo.userId, userInfo.name, userInfo.email, userInfo.createdAt));
     }
 
     // Process user deletion
     private void processUserDeletion(String userId) {
         System.out.println("=== PROCESSING USER DELETION ===");
         System.out.println("User ID: " + userId);
+//        userService.deleteUser(u);
     }
 
     private boolean isValidSignature(String id, String timestamp, String payload,
@@ -229,7 +233,7 @@ public class WebhookController {
         return result.toString();
     }
 
-    // DTO class to hold extracted user information
+
     public static class UserInfo {
         private String userId;
         private String name;
