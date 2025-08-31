@@ -1,209 +1,3 @@
-// pipeline{
-//     agent any
-//     stages{
-//         stage("checkout"){
-//             steps{
-//                 echo "========executing checkout========"
-//                 checkout scm
-//             }
-//         }
-
-//         stage("Validate server"){
-//             steps{
-//                 echo "====++++executing validate server++++===="
-//                 dir('server'){
-//                     sh 'mvn validate'
-//                 }
-                
-//             }
-//             post{
-//                 failure{
-//                     echo "====++++validate server execution failed++++===="
-//                 }
-//             }
-//         }
-
-//         stage("Compile server"){
-//             steps{
-//                 echo "====++++executing Compile server++++===="
-//                 dir('server'){
-//                     sh 'mvn clean compile'
-//                 }
-                
-//             }
-//             post{
-//                 failure{
-//                     echo "====++++Compile server execution failed++++===="
-//                 }
-//             }
-//         }
-
-//         stage("Verify server"){
-//               steps {
-//                 echo "====++++executing Verify server++++===="
-//                 dir('server') {
-//                     withCredentials([
-//                         string(credentialsId: 'db-username', variable: 'DB_USERNAME'),
-//                         string(credentialsId: 'db-password', variable: 'DB_PASSWORD'),
-//                         string(credentialsId: 'db-url', variable: 'DB_URL'),
-//                         string(credentialsId: 'clerk-secret', variable: 'WEBHOOK_SECRET')
-//                     ]) {
-//                         sh '''
-//                             echo "DB User = $DB_USERNAME"
-//                             echo "DB URL = $DB_URL"
-
-//                             # Run tests and generate Jacoco report
-//                             mvn clean verify \
-//                                 -Dspring.datasource.url="$DB_URL" \
-//                                 -Dspring.datasource.username="$DB_USERNAME" \
-//                                 -Dspring.datasource.password="$DB_PASSWORD" \
-//                                 -Dclerk.webhook.secret="$WEBHOOK_SECRET" \
-//                                 jacoco:report
-
-//                             # Create per-build Jacoco report folder
-//                             mkdir -p target/site/jacoco-${BUILD_NUMBER}
-//                             cp -r target/site/jacoco/* target/site/jacoco-${BUILD_NUMBER}/
-//                         '''
-//                     }
-//                 }
-//             }
-//              post{
-//                  always {
-//                     publishHTML([
-//                         allowMissing: false,
-//                         alwaysLinkToLastBuild: true,
-//                         keepAll: true,
-//                         reportDir: "server/target/site/jacoco-${BUILD_NUMBER}",
-//                         reportFiles: 'index.html',
-//                         reportName: "Jacoco Coverage Report #${BUILD_NUMBER}"
-//                     ])
-//                 }
-//              }
-//         }
-
-//         stage("Build server"){
-//             steps{
-//                 echo "====++++executing Build server++++===="
-//                 dir('server'){
-//                     sh 'mvn clean package -DskipTests'
-//                 }
-//             }
-//             post{
-//                 always{
-//                     echo "====++++always++++===="
-//                 }
-//                 success{
-//                     echo "====++++Server Build successfully++++===="
-//                 }
-//                 failure{
-//                     echo "====++++Server Build failed++++===="
-//                 }
-//             }
-//         }
-
-//         stage("Build server image"){
-//             steps{
-//                 echo "====++++executing Build server image++++===="
-//                 dir('server'){
-//                     sh "docker build -t souravkd23/todo-server:${BUILD_NUMBER} ."
-//                 }
-//             }
-//             post{
-//                 success{
-//                     echo "====++++Build server image executed successfully++++===="
-//                 }
-//                 failure{
-//                     echo "====++++Build server image execution failed++++===="
-//                 }
-        
-//             }
-//         }
-
-//         stage("Push Image"){
-//             steps{
-//                 echo "====++++executing Push Image++++===="
-
-//                 dir('server'){
-//                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-//                 sh '''
-//                     echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-//                     docker push souravkd23/todo-server:${BUILD_NUMBER}
-//                     docker rmi souravkd23/todo-server:${BUILD_NUMBER}
-//                 '''}
-//                 }
-            
-//             }
-//             post{
-//                 always{
-//                     echo "====++++always++++===="
-//                 }
-//                 success{
-//                     echo "====++++Push Image executed successfully++++===="
-//                 }
-//                 failure{
-//                     echo "====++++Push Image execution failed++++===="
-//                 }
-        
-//             }
-//         }
-
-//         stage("Deploy to Server") {
-//             steps {
-//                 echo "====++++executing Deployment++++===="
-//                 withCredentials([
-//                     sshUserPrivateKey(credentialsId: 'server-ssh-key', keyFileVariable: 'SSH_KEY'),
-//                     string(credentialsId: 'db-username', variable: 'DB_USERNAME'),
-//                     string(credentialsId: 'db-password', variable: 'DB_PASSWORD'),
-//                     string(credentialsId: 'db-url', variable: 'DB_URL'),
-//                     string(credentialsId: 'clerk-secret', variable: 'WEBHOOK_SECRET')
-//                 ]) {
-//                     sh '''
-//                         # Copy docker-compose.yml to server
-//                         scp -i $SSH_KEY -o StrictHostKeyChecking=no docker-compose.yml user@34.67.188.124:/home/dassourav3738/todo
-
-//                         # SSH into server
-//                         ssh -i $SSH_KEY -o StrictHostKeyChecking=no user@34.67.188.124 << EOF
-//                             cd /home/dassourav3738/todo
-
-//                             # Create .env file dynamically from Jenkins secrets
-//                             echo "DB_USERNAME=$DB_USERNAME" > .env
-//                             echo "DB_PASSWORD=$DB_PASSWORD" >> .env
-//                             echo "DB_URL=$DB_URL" >> .env
-//                             echo "WEBHOOK_SECRET=$WEBHOOK_SECRET" >> .env
-
-//                             # Pull and run latest container
-//                             docker-compose pull
-//                             docker-compose up -d
-
-//                             # Remove sensitive files (optional, safer)
-//                             rm -f .env docker-compose.yml
-//                         EOF
-//                     '''
-//                 }
-//             }
-//             post {
-//                 success {
-//                     echo "====++++Deployment executed successfully++++===="
-//                 }
-//                 failure {
-//                     echo "====++++Deployment failed++++===="
-//                 }
-//             }
-//         }
-//     }
-//     post{
-//         always{
-//             echo "========always========"
-//         }
-//         success{
-//             echo "========pipeline executed successfully ========"
-//         }
-//         failure{
-//             echo "========pipeline execution failed========"
-//         }
-//     }
-// }
-
 pipeline {
     agent any
 
@@ -213,6 +7,7 @@ pipeline {
     stages {
 
         stage("Checkout") {
+            when { branch 'main' }
             steps {
                 echo "======== Executing Checkout ========"
                 checkout scm
@@ -248,38 +43,57 @@ pipeline {
         }
 
         stage("Verify server") {
-    steps {
-        echo "==== Executing Verify Server ===="
-        dir('server') {
-            withCredentials([
-                string(credentialsId: 'db-username', variable: 'DB_USERNAME'),
-                string(credentialsId: 'db-password', variable: 'DB_PASSWORD'),
-                string(credentialsId: 'db-url', variable: 'DB_URL'),
-                string(credentialsId: 'clerk-secret', variable: 'WEBHOOK_SECRET')
-            ]){
-                sh '''
-                    echo "DB User = $DB_USERNAME"
-                    echo "DB URL = $DB_URL"
-                    mvn clean verify    -Dspring.datasource.url="$DB_URL"    -Dspring.datasource.username="$DB_USERNAME"   -Dspring.datasource.password="$DB_PASSWORD" -Dclerk.webhook.secret="$WEBHOOK_SECRET" jacoco:report
-                    mkdir -p target/site/jacoco-${BUILD_NUMBER}
-                    cp -r target/site/jacoco/* target/site/jacoco-${BUILD_NUMBER}/
-                '''
+            steps {
+                echo "==== Executing Verify Server ===="
+                dir('server') {
+                    withCredentials([
+                        string(credentialsId: 'db-username', variable: 'DB_USERNAME'),
+                        string(credentialsId: 'db-password', variable: 'DB_PASSWORD'),
+                        string(credentialsId: 'db-url', variable: 'DB_URL'),
+                        string(credentialsId: 'clerk-secret', variable: 'WEBHOOK_SECRET')
+                    ]) {
+                        sh '''
+                            echo "DB User = $DB_USERNAME"
+                            echo "DB URL = $DB_URL"
+
+                            # Run tests and generate Jacoco report
+                            mvn clean verify \
+                                -Dspring.datasource.url="$DB_URL" \
+                                -Dspring.datasource.username="$DB_USERNAME" \
+                                -Dspring.datasource.password="$DB_PASSWORD" \
+                                -Dclerk.webhook.secret="$WEBHOOK_SECRET" \
+                                jacoco:report
+
+                            # Create per-build Jacoco report folder
+                            mkdir -p target/site/jacoco-${BUILD_NUMBER}
+
+                            # Safely copy Jacoco files
+                            if [ -d target/site/jacoco ]; then
+                                cp -r target/site/jacoco/. target/site/jacoco-${BUILD_NUMBER}/
+                            fi
+                        '''
+                    }
+                }
+            }
+            post {
+                always {
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "server/target/site/jacoco-${BUILD_NUMBER}",
+                        reportFiles: 'index.html',
+                        reportName: "Jacoco Coverage Report #${BUILD_NUMBER}"
+                    ])
+                }success {
+                    echo "==== Server Verify Successfully ===="
+                }
+                failure {
+                    echo "==== Server Verify Failed ===="
+                }
             }
         }
-    }
-    post {
-        always {
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: "server/target/site/jacoco-${BUILD_NUMBER}",
-                reportFiles: 'index.html',
-                reportName: "Jacoco Coverage Report #${BUILD_NUMBER}"
-            ])
-        }
-    }
-}
+
 
 
         stage("Build server") {
@@ -355,7 +169,8 @@ pipeline {
                     string(credentialsId: 'db-username', variable: 'DB_USERNAME'),
                     string(credentialsId: 'db-password', variable: 'DB_PASSWORD'),
                     string(credentialsId: 'db-url', variable: 'DB_URL'),
-                    string(credentialsId: 'clerk-secret', variable: 'WEBHOOK_SECRET')
+                    string(credentialsId: 'clerk-secret', variable: 'WEBHOOK_SECRET'),
+                    usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')
                 ]) {
                     sh '''
                         # Copy docker-compose.yml to server
@@ -369,6 +184,9 @@ pipeline {
                             echo "DB_PASSWORD=$DB_PASSWORD" >> .env
                             echo "DB_URL=$DB_URL" >> .env
                             echo "WEBHOOK_SECRET=$WEBHOOK_SECRET" >> .env
+
+                            # Authenticate to Docker Hub
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
                             docker-compose pull
                             docker-compose up -d
@@ -387,6 +205,7 @@ pipeline {
                 }
             }
         }
+
     }
 
     post {
