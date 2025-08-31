@@ -94,13 +94,15 @@ pipeline {
                         reportFiles: 'index.html',
                         reportName: "Jacoco Coverage Report #${BUILD_NUMBER}"
                     ])
-                }success {
+                }
+                success {
                     echo "==== Server Verify Successfully ===="
                 }
                 failure {
                     echo "==== Server Verify Failed ===="
                 }
             }
+
         }
 
 
