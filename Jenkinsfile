@@ -1,16 +1,17 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout(true) // avoids duplicate checkout
-    }
-    triggers { }
-    environment { }
+    // options {
+    //     skipDefaultCheckout(true) // avoids duplicate checkout
+    // }
+    // triggers { }
+    // environment { }
 
-    // run only on main branch
-    when {
-        branch 'main'
-    }
+    // // run only on main branch
+    // when {
+    //     branch 'main'
+    // }
+
 
     stages {
 
