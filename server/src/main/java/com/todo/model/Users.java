@@ -2,29 +2,99 @@
 package com.todo.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userID;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String userID;
 
-    private String authID;
+//    private String authID;
+    private String name;
+    private String email;
+//    private String profileUrl;
+//    private String profileUrlId;
+    private LocalDateTime createdAt;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todos> todos;
 
+    @OneToMany(mappedBy = "user")
+    private List<Ideas> ideas;
+
+    @OneToMany(mappedBy = "user")
+    private List<SignIn> sign;
+
     public Users() {}
 
-    // getters & setters
-    public Long getUserID() { return userID; }
-    public void setUserID(Long userID) { this.userID = userID; }
+    public String getName() {
+        return name;
+    }
 
-    public String getAuthID() { return authID; }
-    public void setAuthID(String authID) { this.authID = authID; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+//
+//    public String getProfileUrl() {
+//        return profileUrl;
+//    }
+//
+//    public void setProfileUrl(String profileUrl) {
+//        this.profileUrl = profileUrl;
+//    }
+//
+//    public String getProfileUrlId() {
+//        return profileUrlId;
+//    }
+//
+//    public void setProfileUrlId(String profileUrlId) {
+//        this.profileUrlId = profileUrlId;
+//    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    // getters & setters
+    public String getUserID() { return userID; }
+    public void setUserID(String userID) { this.userID = userID; }
+
+//    public String getAuthID() { return authID; }
+//    public void setAuthID(String authID) { this.authID = authID; }
 
     public List<Todos> getTodos() { return todos; }
     public void setTodos(List<Todos> todos) { this.todos = todos; }
+
+    public List<Ideas> getIdeas() {
+        return ideas;
+    }
+
+    public void setIdeas(List<Ideas> ideas) {
+        this.ideas = ideas;
+    }
+
+    public List<SignIn> getSign() {
+        return sign;
+    }
+
+    public void setSign(List<SignIn> sign) {
+        this.sign = sign;
+    }
 }

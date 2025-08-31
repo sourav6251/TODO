@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  todo-server:
+    image: souravkd23/todo-server:${BUILD_NUMBER}   # Jenkins will replace with build number
+    container_name: todo-server
+    restart: always
+    ports:
+      - "8089:8089"   # Expose your Spring Boot server
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      CLERK_WEBHOOK_SECRET: ${WEBHOOK_SECRET}
