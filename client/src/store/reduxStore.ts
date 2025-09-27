@@ -1,17 +1,3 @@
-// // src/redux/reduxStore.ts
-// import { configureStore } from '@reduxjs/toolkit';
-// import reduxSlice from './reduxSlice';
-
-// export const store = configureStore({
-//   reducer: {
-//     user: reduxSlice,
-//   },
-// });
-
-// // Types for dispatch and state
-// export type RootState = ReturnType<typeof store.getState>;
-// export type AppDispatch = typeof store.dispatch;
-// src/store/reduxStore.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // localStorage

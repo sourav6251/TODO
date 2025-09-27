@@ -1,73 +1,86 @@
-# Welcome to your Lovable project
+# Productivity Hub - Personal Task Manager
 
-## Project info
+A comprehensive React-based personal productivity application with three main sections: Todo List, Ideas, and Credentials Storage. Built with TypeScript, React Router, and fully responsive design for mobile and desktop use.
 
-**URL**: https://lovable.dev/projects/6747a2e8-e910-4aef-a39b-e6c36bed046b
+## Features
 
-## How can I edit this code?
+### 📝 Todo List
+- Add, edit, delete, and mark todos as complete
+- Title and description fields for each todo
+- Local storage persistence
+- Sample data included
 
-There are several ways of editing your application.
+### 💡 Ideas
+- Capture and organize your thoughts and ideas
+- Rich text descriptions
+- Date tracking for each idea
+- Local storage persistence
+- Sample data included
 
-**Use Lovable**
+### 🔐 Credentials Storage
+- Store website information and usernames
+- Add notes and password hints (no actual passwords stored)
+- Search functionality
+- Local storage persistence
+- Sample data included
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6747a2e8-e910-4aef-a39b-e6c36bed046b) and start prompting.
+## Mobile Responsive Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Hamburger Menu**: Collapsible navigation for mobile devices
+- **Touch-Friendly**: All buttons and interactive elements are optimized for touch
+- **Responsive Layout**: Adapts to all screen sizes from 360px to desktop
+- **Mobile-First Design**: Optimized for mobile use with desktop enhancements
+- **iOS Compatibility**: Prevents zoom on form inputs and includes proper viewport settings
 
-**Use your preferred IDE**
+## Technical Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **React 19** with TypeScript
+- **React Router** for navigation
+- **Vite** for build tooling
+- **CSS3** with responsive design
+- **localStorage** for data persistence
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+1. Install dependencies:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+2. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+3. Open your browser and navigate to the provided local URL
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Mobile Testing
 
-**Use GitHub Codespaces**
+The application is fully responsive and tested on:
+- Mobile phones (360px - 768px)
+- Tablets (768px - 1024px)
+- Desktop (1024px+)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Browser Support
 
-## What technologies are used for this project?
+- Chrome (recommended)
+- Firefox
+- Safari (including iOS Safari)
+- Edge
 
-This project is built with:
+## Security Note
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The Credentials section is designed for organizing website information only. Never store actual passwords in this application. Use a proper password manager for sensitive data.
 
-## How can I deploy this project?
+## Sample Data
 
-Simply open [Lovable](https://lovable.dev/projects/6747a2e8-e910-4aef-a39b-e6c36bed046b) and click on Share -> Publish.
+The application comes with sample data for all three sections to help you get started quickly. You can edit or delete this sample data as needed.
 
-## Can I connect a custom domain to my Lovable project?
+## Development
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Built with modern React patterns:
+- Functional components with hooks
+- TypeScript for type safety
+- CSS Grid and Flexbox for responsive layouts
+- localStorage for client-side persistence
+- Mobile-first responsive design

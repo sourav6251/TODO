@@ -1,41 +1,29 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import TodosPage from "./pages/TodosPage";
-import IdeasPage from "./pages/IdeasPage";
-import SignInPage from "./pages/SignInPage";
-import NotFound from "./pages/NotFound";
-import Home from "./pages/Home";
-
-const queryClient = new QueryClient();
+import Auth from './components/auth/Auth';
+import Error from './components/common/Error';
+import Layout from './components/common/Layout';
+import { Routes, Route,  BrowserRouter } from 'react-router-dom';
+import HomePage from './view/Home';
+import Todo from './view/Todo';
 
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Home route */}
-          <Route path="/" element={<Home />} />
-
-          {/* Dashboard routes with layout */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/todo" element={<TodosPage />} />
-            <Route path="/ideas" element={<IdeasPage />} />
-            <Route path="/signin" element={<SignInPage />} />
-          </Route>
-
-          {/* Catch-all */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+ 
+  return (
+    
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout/>} >
+          <Route path="/home" element={<HomePage/>} />
+          <Route path="/todo" element={<Todo/>} />
+          <Route path="/ideas" element={<Error/>} />
+          <Route path="/credential" element={<Error/>} />
+          <Route path="/settings" element={<Error/>} />
+          <Route path="/login" element={<Auth/>} />
+          <Route path="/*" element={<Error/>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;
