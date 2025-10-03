@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowRight, 
@@ -12,13 +12,11 @@ import {
   Twitter,
   Linkedin,
   Mail,
-  ArrowUpRight,
-  Menu,
-  X
+  ArrowUpRight
 } from 'lucide-react';
 
 export default function Homepage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   const features = [
@@ -217,7 +215,7 @@ export default function Homepage() {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto"
             >
-              {stats.map((stat, index) => (
+              {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     {stat.number}

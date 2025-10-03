@@ -1,25 +1,30 @@
 package com.todo.service;
 
 import com.todo.dao.UserDAO;
-import com.todo.dto.UserDTO;
+import com.todo.dto.UsersDTO;
 import com.todo.util.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
     @Autowired
-    public UserDAO userDAO;
+    UserDAO userDAO;
 
-    public void userCreate(UserDTO userDTO){
-        userDAO.userCreate(userDTO);
+    public ResponseData createUser(UsersDTO usersDTO){
+        return userDAO.createUser(usersDTO);
     }
-
-    public void updateUser(UserDTO userDTO){
-        userDAO.updateUser(userDTO);
+    public ResponseData showUser(long usersID){
+        return userDAO.showUser(usersID);
     }
-
-    public void deleteUser(UserDTO userDTO){
-        userDAO.deleteUser(userDTO);
+    public ResponseData updateUser(UsersDTO usersDTO){
+        return userDAO.updateUser(usersDTO);
+    }
+    public ResponseData deleteUser(long userId){
+        return userDAO.deleteUser(userId);
+    }
+    public ResponseData updateUserPassword(long userId, String password){
+        return userDAO.updatePassword(userId, password);
     }
 }

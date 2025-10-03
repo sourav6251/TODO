@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { 
-  Plus, ClipboardList, Lightbulb, KeyRound, X, Calendar, Globe, User 
+  Plus, ClipboardList, Lightbulb, KeyRound, X, Globe, User,
+  Calendar, Tag, AlertCircle, Clock, Flag
 } from "lucide-react";
 import { 
   Dialog, 
@@ -11,11 +12,13 @@ import {
   DialogTitle, 
   DialogDescription, 
   DialogFooter 
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import { Label } from "../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { CreateCredentials, CreateIdeas, CreateTodo } from "@/types/Forms";
 
 type MenuItem = "todo" | "ideas" | "credentials";
 
@@ -29,25 +32,11 @@ interface Props {
   variant?: "default" | "primary" | "secondary";
 }
 
-// Form interfaces
-interface TodoFormData {
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high';
-  expireDate: string;
-  tags: string;
-}
-
-interface IdeasFormData {
-  title: string;
-  description: string;
-}
-
-interface CredentialsFormData {
-  url: string;
-  username: string;
-  description: string;
-}
+// interface CreateCredentials {
+//   url: string;
+//   username: string;
+//   description: string;
+// }
 
 const menuItems = [
   {
@@ -251,7 +240,7 @@ export default function AddMenuButton({
         </div>
       </div>
 
-      {/* Enhanced Todo Dialog */}
+      {/* Redesigned Todo Dialog */}
       <TodoDialog 
         open={activeModal === "todo"} 
         onOpenChange={(open) => !open && setActiveModal(null)}
@@ -290,7 +279,7 @@ export default function AddMenuButton({
   );
 }
 
-// Enhanced Todo Dialog Component using your form
+// Redesigned Todo Dialog Component
 function TodoDialog({ 
   open, 
   onOpenChange, 
@@ -298,27 +287,37 @@ function TodoDialog({
 }: { 
   open: boolean; 
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: TodoFormData) => void;
+  onSubmit: (data: CreateTodo) => void;
 }) {
-  const [newTodo, setNewTodo] = useState<TodoFormData>({
+  const [newTodo, setNewTodo] = useState<Omit<CreateTodo, 'tags'> & { tagInput: string }>({
     title: "",
     description: "",
+    status: "pending",
     priority: "medium",
     expireDate: "",
-    tags: ""
+    tagInput: ""
   });
+
+  const [tags, setTags] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodo.title.trim()) {
-      onSubmit(newTodo);
+      const todoData: CreateTodo = {
+        ...newTodo,
+        tags: tags
+      };
+      onSubmit(todoData);
+      // Reset form
       setNewTodo({
         title: "",
         description: "",
+        status: "pending",
         priority: "medium",
         expireDate: "",
-        tags: ""
+        tagInput: ""
       });
+      setTags([]);
     }
   };
 
@@ -329,94 +328,246 @@ function TodoDialog({
       setNewTodo({
         title: "",
         description: "",
+        status: "pending",
         priority: "medium",
         expireDate: "",
-        tags: ""
+        tagInput: ""
       });
+      setTags([]);
     }
   };
 
+  const addTag = () => {
+    const tag = newTodo.tagInput.trim();
+    if (tag && !tags.includes(tag)) {
+      setTags([...tags, tag]);
+      setNewTodo({ ...newTodo, tagInput: "" });
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
+  const priorityOptions = [
+    { value: "low" as const, label: "Low", color: "text-green-600", bgColor: "bg-green-100" },
+    { value: "medium" as const, label: "Medium", color: "text-amber-600", bgColor: "bg-amber-100" },
+    { value: "high" as const, label: "High", color: "text-red-600", bgColor: "bg-red-100" }
+  ];
+
+  const statusOptions = [
+    { value: "pending" as const, label: "Pending", color: "text-gray-600", bgColor: "bg-gray-100" },
+    { value: "in-progress" as const, label: "In Progress", color: "text-blue-600", bgColor: "bg-blue-100" },
+    { value: "completed" as const, label: "Completed", color: "text-green-600", bgColor: "bg-green-100" },
+    { value: "paused" as const, label: "Paused", color: "text-amber-600", bgColor: "bg-amber-100" },
+    { value: "failed" as const, label: "Failed", color: "text-red-600", bgColor: "bg-red-100" }
+  ];
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Create New Todo</DialogTitle>
-          <DialogDescription>
-            Add a new todo to your list
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[550px] p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <ClipboardList className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-semibold text-gray-900">
+                Create New Todo
+              </DialogTitle>
+              <DialogDescription className="text-gray-600">
+                Organize your tasks with details and priorities
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
+        <form onSubmit={handleSubmit} className="px-6 py-4">
+          <div className="space-y-6">
+            {/* Title Section */}
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <span>Task Title</span>
+                <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 value={newTodo.title}
                 onChange={(e) => setNewTodo({...newTodo, title: e.target.value})}
-                placeholder="Enter todo title"
+                placeholder="What needs to be done?"
+                className="h-12 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 required
               />
             </div>
             
-            <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
+            {/* Description Section */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <span>Description</span>
+                <AlertCircle className="w-4 h-4 text-gray-400" />
+              </Label>
               <Textarea
                 id="description"
                 value={newTodo.description}
                 onChange={(e) => setNewTodo({...newTodo, description: e.target.value})}
-                placeholder="Enter todo description"
+                placeholder="Add more details about this task..."
                 rows={3}
+                className="resize-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="priority">Priority</Label>
+            {/* Status & Priority Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {/* Status */}
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  <span>Status</span>
+                </Label>
                 <Select
-                  value={newTodo.priority}
-                  onValueChange={(value: 'low' | 'medium' | 'high') => setNewTodo({...newTodo, priority: value})}
+                  value={newTodo.status}
+                  onValueChange={(value: "pending" | "in-progress" | "completed" | "paused" | "failed") => 
+                    setNewTodo({...newTodo, status: value})
+                  }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
+                    {statusOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${option.bgColor}`} />
+                          {option.label}
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               
-              <div className="grid gap-2">
-                <Label htmlFor="expireDate">Expire Date</Label>
-                <Input
-                  id="expireDate"
-                  type="date"
-                  value={newTodo.expireDate}
-                  onChange={(e) => setNewTodo({...newTodo, expireDate: e.target.value})}
-                />
+              {/* Priority */}
+              <div className="space-y-2">
+                <Label htmlFor="priority" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Flag className="w-4 h-4 text-gray-500" />
+                  <span>Priority</span>
+                </Label>
+                <Select
+                  value={newTodo.priority}
+                  onValueChange={(value: 'low' | 'medium' | 'high') => 
+                    setNewTodo({...newTodo, priority: value})
+                  }
+                >
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {priorityOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${option.bgColor}`} />
+                          {option.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Due Date */}
+            <div className="space-y-2">
+              <Label htmlFor="expireDate" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                <span>Due Date</span>
+              </Label>
+              <Input
+                id="expireDate"
+                type="date"
+                value={newTodo.expireDate}
+                onChange={(e) => setNewTodo({...newTodo, expireDate: e.target.value})}
+                min={new Date().toISOString().split('T')[0]}
+                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
             </div>
             
-            <div className="grid gap-2">
-              <Label htmlFor="tags">Tags (comma separated)</Label>
-              <Input
-                id="tags"
-                value={newTodo.tags}
-                onChange={(e) => setNewTodo({...newTodo, tags: e.target.value})}
-                placeholder="work, urgent, personal"
-              />
+            
+            {/* Tags */}
+            <div className="space-y-2">
+              <Label htmlFor="tags" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Tag className="w-4 h-4 text-gray-500" />
+                <span>Tags</span>
+              </Label>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    id="tags"
+                    value={newTodo.tagInput}
+                    onChange={(e) => setNewTodo({...newTodo, tagInput: e.target.value})}
+                    onKeyDown={handleTagInputKeyDown}
+                    placeholder="Add a tag and press Enter"
+                    className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={addTag}
+                    className="whitespace-nowrap"
+                  >
+                    Add Tag
+                  </Button>
+                </div>
+                
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary"
+                        className="px-3 py-1 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-2 hover:text-blue-900"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              Create Todo
-            </Button>
+          <DialogFooter className="px-0 pb-0 pt-6 mt-6 border-t border-gray-100">
+            <div className="flex w-full gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                className="flex-1 border-gray-300 hover:bg-gray-50"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                className="flex-1 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/25"
+                disabled={!newTodo.title.trim()}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Todo
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -425,8 +576,8 @@ function TodoDialog({
 }
 
 // Ideas Form Component (unchanged)
-function IdeasForm({ onSubmit, onClose }: { onSubmit: (data: IdeasFormData) => void; onClose: () => void }) {
-  const [formData, setFormData] = useState<IdeasFormData>({
+function IdeasForm({ onSubmit, onClose }: { onSubmit: (data: CreateIdeas) => void; onClose: () => void }) {
+  const [formData, setFormData] = useState<CreateIdeas>({
     title: "",
     description: ""
   });
@@ -503,8 +654,8 @@ function IdeasForm({ onSubmit, onClose }: { onSubmit: (data: IdeasFormData) => v
 }
 
 // Credentials Form Component (unchanged)
-function CredentialsForm({ onSubmit, onClose }: { onSubmit: (data: CredentialsFormData) => void; onClose: () => void }) {
-  const [formData, setFormData] = useState<CredentialsFormData>({
+function CredentialsForm({ onSubmit, onClose }: { onSubmit: (data: CreateCredentials) => void; onClose: () => void }) {
+  const [formData, setFormData] = useState<CreateCredentials>({
     url: "",
     username: "",
     description: ""

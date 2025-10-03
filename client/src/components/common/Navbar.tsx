@@ -1,10 +1,10 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import {  NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LogIn, LogOut, Home, CheckSquare, Lightbulb, Key, Settings2, Settings } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../../store/reduxHooks";
+import { Menu, X, LogIn, LogOut, Home, CheckSquare, Lightbulb, Key} from "lucide-react";
+// import { useAppDispatch, useAppSelector } from "../../store/reduxHooks";
 import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar,  AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +12,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import {  logout } from "../../store/reduxSlice";
+} from "@/components/ui/dropdown-menu";
+import { useAppDispatch, useAppSelector } from "@/store/reduxHooks";
+import { logout } from "@/store/reduxSlice";
 
 const Navbar = () => {
   const isLogin = useAppSelector((state) => state.user.isLogin);
@@ -36,7 +37,7 @@ const Navbar = () => {
   
   const navItems = isLogin
     ? [
-        { name: "Home", path: "/home", icon: Home },
+        { name: "Home", path: "/", icon: Home },
         { name: "ToDo", path: "/todo", icon: CheckSquare },
         { name: "Ideas", path: "/ideas", icon: Lightbulb },
         { name: "Credential", path: "/credential", icon: Key },
@@ -74,9 +75,9 @@ const Navbar = () => {
                 <DropdownMenuItem onClick={() => navigate("/profile")}>
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                {/* <DropdownMenuItem onClick={() => navigate("/settings")}>
                   Settings
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -110,14 +111,14 @@ const Navbar = () => {
         {isLogin ? (
           <>
             {/* User Avatar with Dropdown */}
-            {/* <Button
+            <Button
                       onClick={handleLogout}
                       variant="outline"
                       className="w-full justify-start text-red-600 mt-2"
                     >
                       <LogOut className="mr-3 h-5 w-5" />
                       Logout
-                    </Button> */}
+                    </Button>
           </>
         ) : (
           <Button

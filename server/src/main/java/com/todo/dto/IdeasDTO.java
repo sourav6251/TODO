@@ -1,31 +1,15 @@
-package com.todo.model;
+package com.todo.dto;
 
-import jakarta.persistence.*;
-
+import com.todo.model.Users;
 import java.time.LocalDateTime;
 
-@Entity
-public class Ideas {
+public class IdeasDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
     private  String description;
     private LocalDateTime createAt;
-
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
-
-    public Users getUser() {
-        return user;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
-    }
+    private long user;
 
     public long getId() {
         return id;
@@ -59,12 +43,22 @@ public class Ideas {
         this.createAt = createAt;
     }
 
-    public Ideas(String title, String description, LocalDateTime createAt) {
+    public long getUser() {
+        return user;
+    }
+
+    public void setUser(long user) {
+        this.user = user;
+    }
+
+    public IdeasDTO(long id, String title, String description, LocalDateTime createAt, long user) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.createAt = createAt;
+        this.user = user;
     }
 
-    public Ideas() {
+    public IdeasDTO() {
     }
 }

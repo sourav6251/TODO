@@ -5,16 +5,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class Ideas {
+public class Credentials {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String title;
-    private  String description;
+    private String url;
+    private String username;
+    private String description;
     private LocalDateTime createAt;
-
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
@@ -35,12 +34,20 @@ public class Ideas {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getUrl() {
+        return url;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getDescription() {
@@ -59,12 +66,15 @@ public class Ideas {
         this.createAt = createAt;
     }
 
-    public Ideas(String title, String description, LocalDateTime createAt) {
-        this.title = title;
+    public Credentials(String url, String username, String description, LocalDateTime createAt) {
+        this.url = url;
+        this.username = username;
         this.description = description;
         this.createAt = createAt;
     }
 
-    public Ideas() {
+    public Credentials() {
     }
 }
+
+

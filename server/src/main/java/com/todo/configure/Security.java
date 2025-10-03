@@ -1,6 +1,5 @@
 package com.todo.configure;
 
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +21,7 @@ import java.util.List;
 public class Security {
 
     @Value("${frontend.url}")
-    private   String webhookSecret;
+    private   String frontendURL;
 
 
     @Bean
@@ -40,10 +39,7 @@ public class Security {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.getWriter().write("Unauthorized: " + authException.getMessage());
                         })
-                )
-
-//                .addFilterBefore(jwtAuth, UsernamePasswordAuthenticationFilter.class)
-        ;
+                );
         return http.build();
     }
 
@@ -62,7 +58,7 @@ public class Security {
     private CorsConfigurationSource configurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                webhookSecret
+                frontendURL
         ));
         config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
