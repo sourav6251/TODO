@@ -1,41 +1,35 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import TodosPage from "./pages/TodosPage";
-import IdeasPage from "./pages/IdeasPage";
-import SignInPage from "./pages/SignInPage";
-import NotFound from "./pages/NotFound";
-import Home from "./pages/Home";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import Layout from "@/components/common/Layout";
+import Error from "@/components/common/Error";
+import Auth from "@/components/auth/Auth";
+import Homepage from "@/components/view/Home";
+import TodoPage from "@/view/TodoPage";
+import IdeasPage from "@/view/IdeasPages";
+import CredentialsPage from "@/view/CredentialPages";
+import RequireLoginRoute from "@/utils/RequireLoginRoute";
+import ProfilePage from "./view/ProfilePage";
 
-const queryClient = new QueryClient();
-
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Home route */}
-          <Route path="/" element={<Home />} />
-
-          {/* Dashboard routes with layout */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/todo" element={<TodosPage />} />
-            <Route path="/ideas" element={<IdeasPage />} />
-            <Route path="/signin" element={<SignInPage />} />
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+        <Route index element={<Homepage />} />
+          <Route element={<RequireLoginRoute />}>
+            {/* ✅ This makes Homepage show at "/" */}
+            <Route path="todo" element={<TodoPage />} />
+            <Route path="ideas" element={<IdeasPage />} />
+            <Route path="credential" element={<CredentialsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
 
-          {/* Catch-all */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+          {/* login and error can stay outside RequireLoginRoute if you want public access */}
+          <Route path="login" element={<Auth />} />
+          <Route path="*" element={<Error />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;

@@ -1,22 +1,22 @@
 // src/redux/reduxSlice.ts
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import logo from "/logo.png";
 
-interface userState {
+export interface userState {
     isLogin: boolean;
-    // userID:String,
     userEmail: string;
     userName:string;
-    role: string;
+    darkMode: boolean;
     profilePic: string; 
 }
 
 const initialState: userState = {
     isLogin: false,
-    userEmail: "",
-    userName:"",
-    role: "",
-    profilePic: "",
+    userEmail: "String",
+    darkMode: false,
+    userName:"user",
+    profilePic: logo,
 };
 
 const reduxSlice = createSlice({
@@ -25,21 +25,21 @@ const reduxSlice = createSlice({
     reducers: {
         login: (state, action: PayloadAction<userState>) => {
             state.isLogin = true;
-            state.role = action.payload.role;
             state.userEmail = action.payload.userEmail;
             state.userName=action.payload.userName;
             state.profilePic = action.payload.profilePic;
         },
-       
+        toggleDarkmode: (state, action: PayloadAction<boolean>) => {
+            state.darkMode = action.payload;
+        },
         logout: (state) => {
             state.isLogin = false;
-            state.role = "";
             state.userEmail = "";
-            state.userName="";
-            state.profilePic = "";
+            state.userName="Hello user";
+            state.profilePic = logo;
         },
     },
 });
 
-export const { login,  logout } = reduxSlice.actions;
+export const { login, toggleDarkmode, logout } = reduxSlice.actions;
 export default reduxSlice.reducer;

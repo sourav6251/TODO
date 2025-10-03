@@ -11,7 +11,7 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
  * store data
  * 
  * 
- *  const count = useAppSelector((state) => state.user.count);
+ * const count = useAppSelector((state) => state.user.count);
  * retrive data
  * 
  * 
