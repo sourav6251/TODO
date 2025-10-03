@@ -11,37 +11,32 @@ jobs:
 
     steps:
       - name: Install MySQL client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
 
-      - name: Parse DB_URL
+      - name: Extract host and port from DB_URL
         id: parse
         run: |
-          # Example: mysql://user:pass@host:port
+          # Example stored secret:
+          # DB_URL = jdbc:mysql://mysql-1c704450-dassourav5837-de38.f.aivencloud.com:27251
           url="${{ secrets.DB_URL }}"
-          url="${url#mysql://}"
+          # Remove "jdbc:mysql://"
+          url="${url#jdbc:mysql://}"
+          host="${url%%:*}"
+          port="${url#*:}"
 
-          userpass="${url%%@*}"
-          user="${userpass%%:*}"
-          pass="${userpass#*:}"
-
-          hostport="${url#*@}"
-          host="${hostport%%:*}"
-          port="${hostport#*:}"
-
-          echo "user=$user" >> $GITHUB_OUTPUT
-          echo "pass=$pass" >> $GITHUB_OUTPUT
           echo "host=$host" >> $GITHUB_OUTPUT
           echo "port=$port" >> $GITHUB_OUTPUT
 
       - name: Run SQL Query
         run: |
-          # 👉 replace this with your actual query
           echo "INSERT INTO logs (run_time) VALUES (NOW());" > query.sql
 
           mysql \
             --host=${{ steps.parse.outputs.host }} \
             --port=${{ steps.parse.outputs.port }} \
-            --user=${{ steps.parse.outputs.user }} \
-            --password=${{ steps.parse.outputs.pass }} \
+            --user=${{ secrets.DB_USERNAME }} \
+            --password=${{ secrets.DB_PASSWORD }} \
             --ssl-mode=REQUIRED \
             defaultdb < query.sql
