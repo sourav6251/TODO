@@ -15,17 +15,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mysql-client
 
-      - name: Extract host and port from DB_URL
+      - name: Parse DB_URL
         id: parse
         run: |
-          # Example stored secret:
-          # DB_URL = jdbc:mysql://mysql-1c704450-dassourav5837-de38.f.aivencloud.com:27251
           url="${{ secrets.DB_URL }}"
-          # Remove "jdbc:mysql://"
-          url="${url#jdbc:mysql://}"
-          host="${url%%:*}"
-          port="${url#*:}"
+          # Remove "mysql://"
+          url="${url#mysql://}"
 
+          # Extract user and password
+          userpass="${url%%@*}"
+          user="${userpass%%:*}"
+          pass="${userpass#*:}"
+
+          # Extract host and port
+          hostport="${url#*@}"
+          host="${hostport%%:*}"
+          port="${hostport#*:}"
+
+          echo "user=$user" >> $GITHUB_OUTPUT
+          echo "pass=$pass" >> $GITHUB_OUTPUT
           echo "host=$host" >> $GITHUB_OUTPUT
           echo "port=$port" >> $GITHUB_OUTPUT
 
@@ -36,7 +44,7 @@ jobs:
           mysql \
             --host=${{ steps.parse.outputs.host }} \
             --port=${{ steps.parse.outputs.port }} \
-            --user=${{ secrets.DB_USERNAME }} \
-            --password=${{ secrets.DB_PASSWORD }} \
+            --user=${{ steps.parse.outputs.user }} \
+            --password=${{ steps.parse.outputs.pass }} \
             --ssl-mode=REQUIRED \
             defaultdb < query.sql
