@@ -11,19 +11,23 @@ jobs:
 
     steps:
       - name: Install MySQL client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
 
       - name: Parse DB_URL
         id: parse
         run: |
-          # Example: mysql://user:pass@host:port
           url="${{ secrets.DB_URL }}"
+          # Remove "mysql://"
           url="${url#mysql://}"
 
+          # Extract user and password
           userpass="${url%%@*}"
           user="${userpass%%:*}"
           pass="${userpass#*:}"
 
+          # Extract host and port
           hostport="${url#*@}"
           host="${hostport%%:*}"
           port="${hostport#*:}"
@@ -35,7 +39,6 @@ jobs:
 
       - name: Run SQL Query
         run: |
-          # 👉 replace this with your actual query
           echo "INSERT INTO logs (run_time) VALUES (NOW());" > query.sql
 
           mysql \
